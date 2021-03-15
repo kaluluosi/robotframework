@@ -19,7 +19,7 @@ from unicodedata import normalize
 
 from .platform import PY2, PY3
 from .robottypes import is_bytes, is_unicode, unicode
-
+import json
 
 def unic(item):
     item = _unic(item)
@@ -60,6 +60,18 @@ else:
             except UnicodeError:
                 return ''.join(chr(b) if b < 128 else '\\x%x' % b
                                for b in item)
+        
+        if isinstance(item, (list, dict, tuple)):
+            try:
+                item = json.dumps(item, ensure_ascii=False, encoding='cp936')
+            except  UnicodeDecodeError:
+                try:
+                    item = json.dumps(item, ensure_ascii=False, encoding='cp936')
+                except:
+                    pass
+            except:
+                pass
+        
         try:
             return str(item)
         except:
